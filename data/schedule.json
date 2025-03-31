@@ -1,0 +1,60 @@
+[
+  {
+    "id": "1",
+    "day": "Day 1",
+    "date": "WEDNESDAY, 27TH DECEMBER 2023",
+    "events": [
+      {
+        "id": "1-arrival-of-participants",
+        "time": "12:00pm - 4:00pm (GMT +1)",
+        "name": "Arrival of Participants"
+      },
+      {
+        "id": "1-welcome-programme-movie-premiere",
+        "time": "7:30pm - 10:30pm (GMT +1)",
+        "name": "Welcome programme / Movie Premiere",
+        "link": "https://www.youtube.com/live/kbTISnzSoeA?feature=shared"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "day": "Day 2",
+    "date": "THURSDAY, 28TH DECEMBER 2023",
+    "events": [
+      {
+        "id": "2-p-u-s-h",
+        "time": "5:30am - 7:00am (GMT +1)",
+        "name": "P.U.S.H",
+        "link": "https://www.youtube.com/live/rnCSGMtxhSc?feature=shared"
+      },
+      {
+        "id": "2-bible-study",
+        "time": "9:30pm - 12:00pm (GMT +1)",
+        "name": "Bible Study",
+        "link": "https://www.youtube.com/live/dE3PmH2-JHg?feature=shared",
+        "hasOutline": true
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "day": "Day 3",
+    "date": "FRIDAY, 29TH DECEMBER 2023",
+    "events": [
+      {
+        "id": "3-p-u-s-h",
+        "time": "5:30 - 7:00 (GMT +1)",
+        "name": "P.U.S.H",
+        "link": "https://www.youtube.com/live/Sr5SvTBszlI?feature=shared"
+      },
+      {
+        "id": "3-symposium-aspire",
+        "time": "09:30am - 12:00pm (GMT +1)",
+        "name": "Symposium - ASPIRE",
+        "link": "https://www.youtube.com/live/ZrHCG-1KUjo?feature=shared",
+        "hasOutline": true
+      }
+    ]
+  }
+]
