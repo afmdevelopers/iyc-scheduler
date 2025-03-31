@@ -44,6 +44,12 @@ Create a file named `main.py` with the FastAPI code provided in the artifacts.
 mkdir -p data
 ```
 
+## Step 4.1: Create an Uploads Directory
+
+```bash
+mkdir -p uploads
+```
+
 ## Step 5: Run the Application
 
 ```bash
