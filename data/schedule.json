@@ -8,12 +8,6 @@
         "id": "1-arrival-of-participants",
         "time": "12:00pm - 4:00pm (GMT +1)",
         "name": "Arrival of Participants"
-      },
-      {
-        "id": "1-welcome-programme-movie-premiere",
-        "time": "7:30pm - 10:30pm (GMT +1)",
-        "name": "Welcome programme / Movie Premiere",
-        "link": "https://www.youtube.com/live/kbTISnzSoeA?feature=shared"
       }
     ]
   },
@@ -27,13 +21,6 @@
         "time": "5:30am - 7:00am (GMT +1)",
         "name": "P.U.S.H",
         "link": "https://www.youtube.com/live/rnCSGMtxhSc?feature=shared"
-      },
-      {
-        "id": "2-bible-study",
-        "time": "9:30pm - 12:00pm (GMT +1)",
-        "name": "Bible Study",
-        "link": "https://www.youtube.com/live/dE3PmH2-JHg?feature=shared",
-        "hasOutline": true
       }
     ]
   },
