@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import argparse
 
 # Define models for data validation
 class Event(BaseModel):
@@ -362,7 +363,16 @@ def initialize_schedule():
     write_schedule(sample_schedule)
     return sample_schedule
 
+
 # Run the application with: uvicorn main:app --reload
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="IYC Schedule API")
+    parser.add_argument('--port', type=int, default=8000, help='Port to run the server on')
+    args = parser.parse_args()
+    
+    # Get port from environment variable or use command line argument
+    port = int(os.environ.get("PORT", args.port))
+    
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    print(f"Starting Youth Conference Schedule API on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)
