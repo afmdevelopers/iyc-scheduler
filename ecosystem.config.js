@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-      name: "youth-conference-api",
+      name: "iyc-scheduler-api-6000",
       script: "venv/bin/python",  // Path to your virtual env Python
       args: "main.py",            // Your FastAPI main script
       instances: 1,
