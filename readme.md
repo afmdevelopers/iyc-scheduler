@@ -96,21 +96,9 @@ const API_URL = 'http://localhost:8000/api';
 
 ## Deployment
 
-For production deployment, you'll want to:
-
-1. Remove the `--reload` flag when running uvicorn
-2. Use a production ASGI server like Gunicorn with uvicorn workers
-3. Update the CORS settings in the FastAPI app to only allow requests from your frontend domain
-4. Consider using a reverse proxy like Nginx in front of your FastAPI application
-
-Example production deployment command:
+production deployment command:
 
 ```bash
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000
+pm2 start ecosystem.config.js
 ```
 
-## Additional Resources
-
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Uvicorn Documentation](https://www.uvicorn.org/)
-- [Pydantic Documentation](https://pydantic-docs.helpmanual.io/)

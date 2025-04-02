@@ -1,8 +1,9 @@
 module.exports = {
     apps: [{
       name: "iyc-scheduler-api-6000",
-      script: "venv/bin/python",  // Path to your virtual env Python
-      args: "main.py",            // Your FastAPI main script
+      script: "/home/microservices/iyc-scheduler/venv/bin/python",  // Path to virtual env Python
+      args: "main.py",
+      cwd: "/home/microservices/iyc-scheduler", // working directory
       instances: 1,
       autorestart: true,
       watch: false,
