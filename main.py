@@ -1,12 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional
 import json
 import os
+import shutil
 from pathlib import Path
 import re
 import argparse
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 # Define models for data validation
 class Event(BaseModel):
@@ -14,6 +24,7 @@ class Event(BaseModel):
     name: str
     link: Optional[str] = None
     hasOutline: Optional[bool] = False
+    outlineFile: Optional[str] = None
 
 class DayCreate(BaseModel):
     day: str
@@ -47,6 +58,14 @@ app.add_middleware(
 # File path for storing schedule data
 DATA_DIR = Path("./data")
 SCHEDULE_FILE = DATA_DIR / "schedule.json"
+UPLOADS_DIR = Path("./uploads")
+
+# Create directories if they don't exist
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Mount the uploads directory to make files accessible
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Generate a simple ID from a day string (e.g., "Day 1" -> "1")
 def generate_day_id(day_str):
@@ -96,14 +115,16 @@ def write_schedule(schedule):
 # API routes
 @app.get("/")
 def read_root():
-    return {"message": "Youth Conference Schedule API"}
+    return {"message": "International Youth Conference Schedule API"}
 
 @app.get("/api/schedule")
 def get_schedule():
+    logger.info("Getting schedule")
     return read_schedule()
 
 @app.post("/api/schedule/day")
 def add_day(day_data: DayCreate):
+    logger.info(f"Adding day: {day_data.day}")
     schedule = read_schedule()
     
     # Check if day already exists
@@ -127,6 +148,7 @@ def add_day(day_data: DayCreate):
 
 @app.post("/api/schedule/event")
 def add_event(event_data: EventCreate):
+    logger.info(f"Adding event: {event_data.name} to day {event_data.day_id}")
     schedule = read_schedule()
     
     # Find the day by ID
@@ -169,8 +191,80 @@ def add_event(event_data: EventCreate):
     write_schedule(schedule)
     return schedule
 
+# New endpoints for file upload
+@app.post("/api/schedule/event/upload")
+async def upload_event_with_file(
+    day_id: str = Form(...),
+    time: str = Form(...),
+    name: str = Form(...),
+    link: Optional[str] = Form(None),
+    hasOutline: bool = Form(False),
+    file: Optional[UploadFile] = File(None)
+):
+    logger.info(f"Adding event with file: {name} to day {day_id}")
+    schedule = read_schedule()
+    
+    # Find the day by ID
+    day_found = False
+    for day in schedule:
+        if day["id"] == day_id:
+            day_found = True
+            
+            # Check if event with same name already exists
+            for event in day["events"]:
+                if event["name"] == name:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"Event with name '{name}' already exists for {day['day']}"
+                    )
+            
+            # Generate a simple ID for the event
+            event_id = generate_event_id(day["id"], name)
+            
+            # Create event dict with only non-None values
+            event_dict = {
+                "id": event_id,
+                "time": time,
+                "name": name
+            }
+            
+            if link:
+                event_dict["link"] = link
+            
+            outlineFile = None
+            
+            # Handle file upload if provided
+            if file and hasOutline:
+                logger.info(f"Processing file {file.filename} for event {name}")
+                # Create an event-specific directory for the file
+                event_dir = UPLOADS_DIR / event_id
+                os.makedirs(event_dir, exist_ok=True)
+                
+                # Save the file with its original name
+                file_path = event_dir / file.filename
+                with open(file_path, "wb") as f:
+                    shutil.copyfileobj(file.file, f)
+                
+                # Update the event with the file path
+                outlineFile = f"/uploads/{event_id}/{file.filename}"
+                event_dict["hasOutline"] = True
+                event_dict["outlineFile"] = outlineFile
+            elif hasOutline:
+                event_dict["hasOutline"] = True
+            
+            # Add event to the day
+            day["events"].append(event_dict)
+            break
+    
+    if not day_found:
+        raise HTTPException(status_code=404, detail=f"Day with ID '{day_id}' not found")
+    
+    write_schedule(schedule)
+    return schedule
+
 @app.put("/api/schedule/event/{day_id}/{event_id}")
 def update_event(day_id: str, event_id: str, event: Event):
+    logger.info(f"Updating event: {event_id} for day {day_id}")
     schedule = read_schedule()
     
     # Find the day by ID
@@ -212,8 +306,42 @@ def update_event(day_id: str, event_id: str, event: Event):
                     if event.hasOutline:
                         event_dict["hasOutline"] = event.hasOutline
                     
+                    # Keep the existing outline file if it exists
+                    if "outlineFile" in existing_event and event.hasOutline:
+                        event_dict["outlineFile"] = existing_event["outlineFile"]
+                    
+                    # If outline file is specifically provided, use it
+                    if event.outlineFile:
+                        event_dict["outlineFile"] = event.outlineFile
+                    
                     # Update event
                     day["events"][i] = event_dict
+                    
+                    # If the ID changed (due to name change), we might need to move any uploaded files
+                    if new_event_id != event_id and "outlineFile" in event_dict:
+                        old_dir = UPLOADS_DIR / event_id
+                        new_dir = UPLOADS_DIR / new_event_id
+                        
+                        if old_dir.exists():
+                            # Create new directory
+                            os.makedirs(new_dir, exist_ok=True)
+                            
+                            # Move files from old to new directory
+                            for file_path in old_dir.glob("*"):
+                                shutil.move(str(file_path), str(new_dir / file_path.name))
+                            
+                            # Update the file path in the event
+                            if event_dict["outlineFile"]:
+                                old_path = event_dict["outlineFile"]
+                                filename = old_path.split("/")[-1]
+                                event_dict["outlineFile"] = f"/uploads/{new_event_id}/{filename}"
+                            
+                            # Remove the old directory if it's empty
+                            try:
+                                os.rmdir(old_dir)
+                            except OSError:
+                                pass
+                    
                     break
             
             if not event_found:
@@ -227,8 +355,64 @@ def update_event(day_id: str, event_id: str, event: Event):
     write_schedule(schedule)
     return schedule
 
+@app.post("/api/schedule/event/{day_id}/{event_id}/upload")
+async def upload_outline(
+    day_id: str,
+    event_id: str,
+    file: UploadFile = File(...)
+):
+    logger.info(f"Uploading outline for event: {event_id} in day {day_id}")
+    try:
+        logger.info(f"File details: name={file.filename}, content_type={file.content_type}")
+        schedule = read_schedule()
+        
+        # Find the day by ID
+        day_found = False
+        for day in schedule:
+            if day["id"] == day_id:
+                day_found = True
+                
+                # Find the event by ID
+                event_found = False
+                for i, event in enumerate(day["events"]):
+                    if event["id"] == event_id:
+                        event_found = True
+                        
+                        # Create an event-specific directory for the file
+                        event_dir = UPLOADS_DIR / event_id
+                        os.makedirs(event_dir, exist_ok=True)
+                        
+                        # Save the file with its original name
+                        file_path = event_dir / file.filename
+                        logger.info(f"Saving file to {file_path}")
+                        with open(file_path, "wb") as f:
+                            content = await file.read()
+                            f.write(content)
+                        
+                        # Update the event with the file path and hasOutline flag
+                        event["hasOutline"] = True
+                        event["outlineFile"] = f"/uploads/{event_id}/{file.filename}"
+                        break
+                
+                if not event_found:
+                    logger.error(f"Event with ID '{event_id}' not found")
+                    raise HTTPException(status_code=404, detail=f"Event with ID '{event_id}' not found")
+                
+                break
+        
+        if not day_found:
+            logger.error(f"Day with ID '{day_id}' not found")
+            raise HTTPException(status_code=404, detail=f"Day with ID '{day_id}' not found")
+        
+        write_schedule(schedule)
+        return schedule
+    except Exception as e:
+        logger.error(f"Error uploading file: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+
 @app.delete("/api/schedule/event/{day_id}/{event_id}")
 def delete_event(day_id: str, event_id: str):
+    logger.info(f"Deleting event: {event_id} from day {day_id}")
     schedule = read_schedule()
     
     # Find the day by ID
@@ -242,6 +426,12 @@ def delete_event(day_id: str, event_id: str):
             for i, existing_event in enumerate(day["events"]):
                 if existing_event["id"] == event_id:
                     event_found = True
+                    
+                    # Delete any uploaded files for this event
+                    event_dir = UPLOADS_DIR / event_id
+                    if event_dir.exists():
+                        shutil.rmtree(event_dir)
+                    
                     # Delete event
                     day["events"].pop(i)
                     break
@@ -259,6 +449,7 @@ def delete_event(day_id: str, event_id: str):
 
 @app.delete("/api/schedule/day/{day_id}")
 def delete_day(day_id: str):
+    logger.info(f"Deleting day: {day_id}")
     schedule = read_schedule()
     
     # Find the day by ID
@@ -266,6 +457,13 @@ def delete_day(day_id: str):
     for i, day in enumerate(schedule):
         if day["id"] == day_id:
             day_found = True
+            
+            # Delete any uploaded files for all events in this day
+            for event in day["events"]:
+                event_dir = UPLOADS_DIR / event["id"]
+                if event_dir.exists():
+                    shutil.rmtree(event_dir)
+            
             # Delete day
             schedule.pop(i)
             break
@@ -278,6 +476,7 @@ def delete_day(day_id: str):
 
 @app.post("/api/schedule/initialize")
 def initialize_schedule():
+    logger.info("Initializing sample schedule")
     # Sample schedule data with auto-generated IDs
     sample_days = [
         {
@@ -364,10 +563,10 @@ def initialize_schedule():
     return sample_schedule
 
 
-# Run the application with: uvicorn main:app --reload
+# Run the application with: uvicorn main:app --reload --port 6000
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="IYC Schedule API")
-    parser.add_argument('--port', type=int, default=8000, help='Port to run the server on')
+    parser.add_argument('--port', type=int, default=6000, help='Port to run the server on')
     args = parser.parse_args()
     
     # Get port from environment variable or use command line argument

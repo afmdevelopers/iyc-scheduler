@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-6">Youth Conference Schedule Admin</h1>
+        <h1 class="text-3xl font-bold text-center mb-6">International Youth Conference Schedule Admin</h1>
         
         <!-- Error Message Box -->
         <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -70,28 +70,22 @@
                 <form id="addEventForm">
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Day</label>
-                        <select id="eventDayId" class="w-full p-2 border rounded" required>
+                        <select id="eventDayId" name="day_id" class="w-full p-2 border rounded" required>
                             <option value="">Select a day</option>
                             <!-- Days will be populated here -->
                         </select>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Time (e.g., "9:30am - 12:00pm (GMT +1)")</label>
-                        <input type="text" id="eventTime" class="w-full p-2 border rounded" required>
+                        <input type="text" id="eventTime" name="time" class="w-full p-2 border rounded" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Event Name</label>
-                        <input type="text" id="eventName" class="w-full p-2 border rounded" required>
+                        <input type="text" id="eventName" name="name" class="w-full p-2 border rounded" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">YouTube Link (optional)</label>
-                        <input type="url" id="eventLink" class="w-full p-2 border rounded">
-                    </div>
-                    <div class="mb-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="eventHasOutline" class="mr-2">
-                            <span class="text-gray-700">Has Outline</span>
-                        </label>
+                        <input type="url" id="eventLink" name="link" class="w-full p-2 border rounded">
                     </div>
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
                         Add Event
@@ -137,12 +131,6 @@
                         <label class="block text-gray-700 mb-2">YouTube Link (optional)</label>
                         <input type="url" id="updateEventLink" class="w-full p-2 border rounded">
                     </div>
-                    <div class="mb-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="updateEventHasOutline" class="mr-2">
-                            <span class="text-gray-700">Has Outline</span>
-                        </label>
-                    </div>
                     <div class="flex space-x-4">
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
                             Update Event
@@ -158,6 +146,7 @@
 
     <script>
         // Set your API URL here
+        // const API_URL = "http://0.0.0.0:6000";
         const API_URL = "https://iyc-scheduler.onrender.com";
         let scheduleData = [];
 
@@ -283,14 +272,6 @@
                             `;
                         }
                         
-                        if (event.hasOutline) {
-                            eventHtml += `
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-2">
-                                    Has Outline
-                                </span>
-                            `;
-                        }
-                        
                         eventHtml += `
                                 </div>
                                 <button class="bg-red-500 text-white px-2 py-1 rounded text-sm" onclick="deleteEvent('${day.id}', '${event.id}')">
@@ -366,19 +347,30 @@
             }
         });
 
-        // Add event
+        // Add event (no outline support)
         document.getElementById('addEventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const eventData = {
-                day_id: document.getElementById('eventDayId').value,
-                time: document.getElementById('eventTime').value,
-                name: document.getElementById('eventName').value,
-                link: document.getElementById('eventLink').value || null,
-                hasOutline: document.getElementById('eventHasOutline').checked
-            };
+            const dayId = document.getElementById('eventDayId').value;
+            const time = document.getElementById('eventTime').value;
+            const name = document.getElementById('eventName').value;
+            const link = document.getElementById('eventLink').value;
+            
+            if (!dayId || !time || !name) {
+                showError('Please fill all required fields');
+                return;
+            }
             
             try {
+                // Use the regular JSON endpoint
+                const eventData = {
+                    day_id: dayId,
+                    time: time,
+                    name: name,
+                    link: link || null,
+                    hasOutline: false
+                };
+                
                 const response = await fetch(`${API_URL}/api/schedule/event`, {
                     method: 'POST',
                     headers: {
@@ -400,7 +392,6 @@
                 document.getElementById('eventTime').value = '';
                 document.getElementById('eventName').value = '';
                 document.getElementById('eventLink').value = '';
-                document.getElementById('eventHasOutline').checked = false;
                 
                 // Switch to view schedule tab
                 switchTab('viewSchedule');
@@ -420,7 +411,7 @@
                 time: document.getElementById('updateEventTime').value,
                 name: document.getElementById('updateEventName').value,
                 link: document.getElementById('updateEventLink').value || null,
-                hasOutline: document.getElementById('updateEventHasOutline').checked
+                hasOutline: false
             };
             
             try {
@@ -595,7 +586,6 @@
             document.getElementById('updateEventTime').value = selectedEvent.time;
             document.getElementById('updateEventName').value = selectedEvent.name;
             document.getElementById('updateEventLink').value = selectedEvent.link || '';
-            document.getElementById('updateEventHasOutline').checked = selectedEvent.hasOutline || false;
             
             // Show form
             document.getElementById('updateEventForm').classList.remove('hidden');
