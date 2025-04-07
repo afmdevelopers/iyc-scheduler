@@ -2,45 +2,107 @@
   {
     "id": "1",
     "day": "Day 1",
-    "date": "WEDNESDAY, 27TH DECEMBER 2023",
+    "date": "THURSDAY, 17TH APRIL 2025",
     "events": [
       {
-        "id": "1-arrival-of-participants",
-        "time": "12:00pm - 4:00pm (GMT +1)",
-        "name": "Arrival of Participants"
+        "id": "1-welcome-ceremony",
+        "time": "06:00 pm - 07:30 pm (GMT +1)",
+        "name": "Welcome Ceremony ",
+        "link": "https://www.youtube.com/watch?v=5yEhSpqI4n8"
       }
     ]
   },
   {
     "id": "2",
     "day": "Day 2",
-    "date": "THURSDAY, 28TH DECEMBER 2023",
+    "date": "FRIDAY, 18TH APRIL 2025",
     "events": [
       {
-        "id": "2-p-u-s-h",
-        "time": "5:30am - 7:00am (GMT +1)",
-        "name": "P.U.S.H",
-        "link": "https://www.youtube.com/live/rnCSGMtxhSc?feature=shared"
+        "id": "2-push",
+        "time": "05:30 am - 07:00 am (GMT +1)",
+        "name": "PUSH ",
+        "link": "https://www.youtube.com/watch?v=qmEnJr_hBBY"
+      },
+      {
+        "id": "2-easter-bible-study",
+        "time": "10:00 am - 12:45 pm (GMT +1)",
+        "name": "Easter Bible Study ",
+        "link": "https://www.youtube.com/watch?v=FbLV7AitVEI"
+      },
+      {
+        "id": "2-easter-retreat-film-show",
+        "time": "03:00 pm - 04:30 pm (GMT +1)",
+        "name": "Easter Retreat - Film Show",
+        "link": "https://www.youtube.com/watch?v=T0Q46YMoWio"
+      },
+      {
+        "id": "2-easter-evening-service",
+        "time": "05:30 pm - 07:00 pm (GMT +1)",
+        "name": "Easter Evening Service ",
+        "link": "https://www.youtube.com/watch?v=mCTPNTzi1kc"
       }
     ]
   },
   {
     "id": "3",
     "day": "Day 3",
-    "date": "FRIDAY, 29TH DECEMBER 2023",
+    "date": "SATURDAY, 19TH APRIL 2025",
     "events": [
       {
-        "id": "3-p-u-s-h",
-        "time": "5:30 - 7:00 (GMT +1)",
-        "name": "P.U.S.H",
-        "link": "https://www.youtube.com/live/Sr5SvTBszlI?feature=shared"
+        "id": "3-push",
+        "time": "05:30 am - 07:00 am (GMT +1)",
+        "name": "PUSH ",
+        "link": "https://www.youtube.com/watch?v=NtRSXobm9Hg"
       },
       {
-        "id": "3-symposium-aspire",
-        "time": "09:30am - 12:00pm (GMT +1)",
-        "name": "Symposium - ASPIRE",
-        "link": "https://www.youtube.com/live/ZrHCG-1KUjo?feature=shared",
-        "hasOutline": true
+        "id": "3-iyc-bible-study",
+        "time": "10:00 am - 12:45 pm (GMT +1)",
+        "name": "IYC Bible Study ",
+        "link": "https://www.youtube.com/watch?v=gJE7X6T-FMA"
+      },
+      {
+        "id": "3-aspire-prac-cal-applica-on-session",
+        "time": "05:00 pm - 07:00 pm (GMT +1)",
+        "name": "ASPIRE - Prac\u0000cal Applica\u0000on Session ",
+        "link": "https://www.youtube.com/watch?v=Ewuc4QT_KuM"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "day": "Day 4",
+    "date": "SUNDAY, 20TH APRIL 2025",
+    "events": [
+      {
+        "id": "4-sunday-service",
+        "time": "09:00 am - 12:00 pm (GMT +1)",
+        "name": "Sunday Service ",
+        "link": "https://www.youtube.com/watch?v=2KDv-TwPnYg"
+      },
+      {
+        "id": "4-iyc-bible-teaching",
+        "time": "03:30 pm - 05:00 pm ",
+        "name": "IYC Bible Teaching ",
+        "link": "https://www.youtube.com/watch?v=8rrEkTfewtI"
+      },
+      {
+        "id": "4-victory-night",
+        "time": "08:00 pm- 11:00 pm (GMT +1)",
+        "name": "Victory Night ",
+        "link": "https://www.youtube.com/watch?v=DT1ttCuaXeg"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "day": "Day 5",
+    "date": "MONDAY, 21TH APRIL 2025",
+    "events": [
+      {
+        "id": "5-push",
+        "time": "05:30 am - 07:00 am (GMT +1)",
+        "name": "PUSH ",
+        "link": "https://www.youtube.com/watch?v=yLHyE5zrtOc"
       }
     ]
   }
