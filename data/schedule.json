@@ -27,7 +27,9 @@
         "id": "2-easter-bible-study",
         "time": "10:00 am - 12:45 pm (GMT +1)",
         "name": "Easter Bible Study ",
-        "link": "https://www.youtube.com/watch?v=FbLV7AitVEI"
+        "link": "https://www.youtube.com/watch?v=FbLV7AitVEI",
+        "hasOutline": true,
+        "outlinePath": "/Easter Bible Study - Student's Copy.pdf"
       },
       {
         "id": "2-easter-retreat-film-show",
@@ -58,7 +60,9 @@
         "id": "3-iyc-bible-study",
         "time": "10:00 am - 12:45 pm (GMT +1)",
         "name": "IYC Bible Study ",
-        "link": "https://www.youtube.com/watch?v=gJE7X6T-FMA"
+        "link": "https://www.youtube.com/watch?v=gJE7X6T-FMA",
+        "hasOutline": true,
+        "outlinePath": "/IYC Bible Study - Student's Copy.pdf"
       },
       {
         "id": "3-aspire-prac-cal-applica-on-session",
